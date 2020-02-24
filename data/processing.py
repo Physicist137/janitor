@@ -1,9 +1,9 @@
 from data.models import Message, Word
 from data.database import Session
 from sqlalchemy.sql.expression import func
+import ast
 
-
-def word_count():
+def process_word_count():
 	session = Session()
 
 	class_max = session.query(func.max(Message.classification)).first()[0]
@@ -33,6 +33,24 @@ def word_count():
 				dataset[word][classification] += 1
 
 
-	return (dataset, all_words)
+	return dataset
 
 
+def upgrade_database(dataset):
+	session = Session()
+
+	num_rows_deleted = session.query(Word).delete()
+	for word in dataset:
+		session.add(Word(word=word, count=str(dataset[word])))
+
+	session.commit()
+
+
+def load_word_count():
+	session = Session()
+
+	dataset = dict()
+	for word,count in session.query(Word.word, Word.count):
+		dataset[word] = ast.literal_eval(count)
+
+	return dataset
