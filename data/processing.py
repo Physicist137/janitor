@@ -33,4 +33,6 @@ def word_count():
 				dataset[word][classification] += 1
 
 
-	return (dataset)
+	return (dataset, all_words)
+
+
