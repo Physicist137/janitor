@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from data.models import Word, ClassCount
+from data.models import Word, CountMessage, CountWord
 
 engine = create_engine('sqlite:///janitor.db', echo=True)
 Session = sessionmaker(bind=engine)
@@ -20,21 +20,34 @@ def upgrade_words(dataset):
 	session.commit()
 
 
-def upgrade_count(array):
+def upgrade_message_count(array):
 	session = Session()
 
-	num_rows_deleted = session.query(ClassCount).delete()
+	num_rows_deleted = session.query(CountMessage).delete()
 	for i in range(0, len(array)):
-		session.add(ClassCount(id=i, count=array[i]))
+		session.add(CountMessage(id=i, count=array[i]))
+
+	session.commit()
+
+
+def upgrade_word_count(array):
+	session = Session()
+
+	num_rows_deleted = session.query(CountWord).delete()
+	for i in range(0, len(array)):
+		session.add(CountWord(id=i, count=array[i]))
 
 	session.commit()
 
 
 def upgrade_database():
-	from data.processing import process_word_count
-	dataset = process_word_count()
+	import data.processing
+
+	dataset = data.processing.process_word_count()
 	upgrade_words(dataset)
 
-	from data.processing import message_count
-	array_count = message_count()
-	upgrade_count(array_count)
+	message_count = data.processing.message_count()
+	upgrade_message_count(message_count)
+
+	word_count = data.processing.word_count()
+	upgrade_word_count(word_count)

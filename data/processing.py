@@ -1,4 +1,4 @@
-from data.models import Message, Word
+from data.models import Message, Word, CountMessage, CountWord
 from data.database import Session
 from sqlalchemy.sql.expression import func
 import ast
@@ -59,17 +59,44 @@ def message_count():
 	return message_count
 
 
-def upgrade_words(dataset):
+def word_count():
+	session = Session()
+	class_array_size = 1 + max_class()
+	word_count = [0] * class_array_size
+
+	for count in session.query(Word.count):
+		arr = ast.literal_eval(count[0])
+
+		for i in range(0, len(word_count)):
+			word_count[i] += arr[i]
+		
+
+	return word_count
+
+
+def load_message_count():
 	session = Session()
 
-	num_rows_deleted = session.query(Word).delete()
-	for word in dataset:
-		session.add(Word(word=word, count=str(dataset[word])))
+	class_array_size = 1 + max_class()
+	message_count = [0] * class_array_size
+	for count in session.query(CountMessage).all():
+		message_count[count.id] = count.count
 
-	session.commit()
+	return message_count
 
 
-def load_all_word_count():
+def load_word_count():
+	session = Session()
+
+	class_array_size = 1 + max_class()
+	word_count = [0] * class_array_size
+	for count in session.query(WordCount).all():
+		word_count[count.id] = count.count
+
+	return word_count
+
+
+def load_all_word_dataset():
 	session = Session()
 
 	dataset = dict()
@@ -79,14 +106,14 @@ def load_all_word_count():
 	return dataset
 
 
-def load_one_word_count(word):
+def load_one_word_dataset(word):
 	session = Session()
 	result = session.query(Word).filter(Word.word == word).first()
 	if result is None: return None
 	else: return ast.literal_eval(result.count)
 	
 
-def load_some_word_count(words):
+def load_some_word_dataset(words):
 	session = Session()
 
 	dataset = dict()
@@ -98,7 +125,7 @@ def load_some_word_count(words):
 	return dataset	
 
 
-def load_word_count(arg = None):
+def load_word_dataset(arg = None):
 	if arg is None: return load_all_word_count()
 	elif isinstance(arg, list): return load_some_word_count(arg)
 	elif isinstance(arg, str): return load_one_word_count(arg)

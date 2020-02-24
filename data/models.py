@@ -38,8 +38,18 @@ class Word(Base):
 		return "<Word(word='%s')>" % (self.word,)
 
 
-class ClassCount(Base):
-	__tablename__ = 'class_count'
+class CountMessage(Base):
+	__tablename__ = 'count_message'
+	
+	id = Column(Integer, primary_key=True)
+	count = Column(Integer, nullable=False)
+
+	def __repr__(self):
+		return "<CountMessage(id=%d, count=%d)>" % (self.id, self.count)
+
+
+class CountWord(Base):
+	__tablename__ = 'count_word'
 	
 	id = Column(Integer, primary_key=True)
 	count = Column(Integer, nullable=False)
