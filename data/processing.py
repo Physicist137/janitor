@@ -90,7 +90,7 @@ def load_word_count():
 
 	class_array_size = 1 + max_class()
 	word_count = [0] * class_array_size
-	for count in session.query(WordCount).all():
+	for count in session.query(CountWord).all():
 		word_count[count.id] = count.count
 
 	return word_count
@@ -126,7 +126,7 @@ def load_some_word_dataset(words):
 
 
 def load_word_dataset(arg = None):
-	if arg is None: return load_all_word_count()
-	elif isinstance(arg, list): return load_some_word_count(arg)
-	elif isinstance(arg, str): return load_one_word_count(arg)
+	if arg is None: return load_all_word_dataset()
+	elif isinstance(arg, list): return load_some_word_dataset(arg)
+	elif isinstance(arg, str): return load_one_word_dataset(arg)
 	else: return None

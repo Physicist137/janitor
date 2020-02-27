@@ -2,7 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from data.models import Word, CountMessage, CountWord
 
-engine = create_engine('sqlite:///janitor.db', echo=True)
+engine = create_engine('sqlite:///janitor.db', echo=False)
 Session = sessionmaker(bind=engine)
 
 def create_database():
